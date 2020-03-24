@@ -48,12 +48,24 @@
             return jsonObj;
         },
 
-        generateFieldJson: function( sourceFile, nameRegex, callback){
+        generateFieldJson: function( source, nameRegex, callback){
+            if (typeof source === 'string' || source instanceof String) {
+                source = {
+                    sourceFile: source
+                }
+            }
+            var sourceFile = source.sourceFile
             var regName = /FieldName: ([^\n]*)/,
                 regType = /FieldType: ([A-Za-z\t .]+)/,
                 regFlags = /FieldFlags: ([0-9\t .]+)/,
+                regValue = null,
                 fieldArray = [],
                 currField = {};
+            if (source.readValuesMultiline) {
+                regValue = /FieldValue: ([\w\W\s]*?)($|---(\n|$)|Field[A-Z][\w]+:[^\n]*)/
+            } else if (source.readValues) {
+                regValue = /FieldValue: ([^\n]*)/
+            }
 
             if(nameRegex !== null && (typeof nameRegex) == 'object' ) regName = nameRegex;
 
@@ -81,7 +93,11 @@
                         currField['fieldFlags'] = '';
                     }
 
-                    currField['fieldValue'] = '';
+                    if(regValue && field.match(regValue)){
+                        currField['fieldValue'] = field.match(regValue)[1].trim()|| '';
+                    }else{
+                        currField['fieldValue'] = '';
+                    }
 
                     fieldArray.push(currField);
                 });
