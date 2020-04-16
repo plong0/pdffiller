@@ -139,9 +139,6 @@
                 formData = fdf.generator( fieldValues, tempFDF );
 
             var args = [sourceFile, "fill_form", tempFDF, "output", destinationFile];
-            if (shouldFlatten) {
-                args.push("flatten");
-            }
             if (ownerPW) {
                 args.push("owner_pw");
                 args.push(ownerPW);
@@ -149,6 +146,9 @@
             if (userPW) {
                 args.push("user_pw");
                 args.push(userPW);
+            }
+            if (shouldFlatten) {
+                args.push("flatten");
             }
             execFile( "pdftk", args, function (error, stdout, stderr) {
 
