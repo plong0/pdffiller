@@ -60,16 +60,34 @@
                 regFlags = /FieldFlags: ([0-9\t .]+)/,
                 regValue = null,
                 fieldArray = [],
-                currField = {};
+                currField = {},
+                ownerPW = null,
+                userPW = null;
             if (source.readValuesMultiline) {
                 regValue = /FieldValue: ([\w\W\s]*?)($|---(\n|$)|Field[A-Z][\w]+:[^\n]*)/
             } else if (source.readValues) {
                 regValue = /FieldValue: ([^\n]*)/
             }
+            if (source.ownerPW) {
+                ownerPW = source.ownerPW;
+            }
+            if (source.userPW) {
+                userPW = source.userPW;
+            }
 
             if(nameRegex !== null && (typeof nameRegex) == 'object' ) regName = nameRegex;
 
-            execFile( "pdftk", [sourceFile, "dump_data_fields_utf8"], function (error, stdout, stderr) {
+            var args = [sourceFile, "dump_data_fields_utf8"];
+            if (ownerPW) {
+                args.push("owner_pw");
+                args.push(ownerPW);
+            }
+            if (userPW) {
+                args.push("user_pw");
+                args.push(userPW);
+            }
+
+            execFile( "pdftk", args, function (error, stdout, stderr) {
                 if (error) {
                     console.log('exec error: ' + error);
                     return callback(error, null);
