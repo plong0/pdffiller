@@ -119,7 +119,16 @@
         },
 
         fillFormWithOptions: function( sourceFile, destinationFile, fieldValues, shouldFlatten, tempFDFPath, callback ) {
-
+            var ownerPW = null;
+            if (fieldValues.hasOwnProperty('##OWNER_PW##')) {
+                ownerPW = fieldValues['##OWNER_PW##'];
+                delete fieldValues['##OWNER_PW##'];
+            }
+            var userPW
+            if (fieldValues.hasOwnProperty('##USER_PW##')) {
+                userPW = fieldValues['##USER_PW##'];
+                delete fieldValues['##USER_PW##'];
+            }
 
             //Generate the data from the field values.
             var randomSequence = Math.random().toString(36).substring(7);
@@ -132,6 +141,14 @@
             var args = [sourceFile, "fill_form", tempFDF, "output", destinationFile];
             if (shouldFlatten) {
                 args.push("flatten");
+            }
+            if (ownerPW) {
+                args.push("owner_pw")
+                args.push(ownerPW)
+            }
+            if (userPW) {
+                args.push("user_pw")
+                args.push(userPW)
             }
             execFile( "pdftk", args, function (error, stdout, stderr) {
 
