@@ -124,7 +124,7 @@
                 ownerPW = fieldValues['##OWNER_PW##'];
                 delete fieldValues['##OWNER_PW##'];
             }
-            var userPW
+            var userPW = null;
             if (fieldValues.hasOwnProperty('##USER_PW##')) {
                 userPW = fieldValues['##USER_PW##'];
                 delete fieldValues['##USER_PW##'];
@@ -143,12 +143,12 @@
                 args.push("flatten");
             }
             if (ownerPW) {
-                args.push("owner_pw")
-                args.push(ownerPW)
+                args.push("owner_pw");
+                args.push(ownerPW);
             }
             if (userPW) {
-                args.push("user_pw")
-                args.push(userPW)
+                args.push("user_pw");
+                args.push(userPW);
             }
             execFile( "pdftk", args, function (error, stdout, stderr) {
 
