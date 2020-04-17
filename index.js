@@ -129,6 +129,11 @@
         },
 
         fillFormWithOptions: function( sourceFile, destinationFile, fieldValues, shouldFlatten, tempFDFPath, callback ) {
+            var inputPW = null;
+            if (fieldValues.hasOwnProperty('##INPUT_PW##')) {
+                inputPW = fieldValues['##INPUT_PW##'];
+                delete fieldValues['##INPUT_PW##'];
+            }
             var ownerPW = null;
             if (fieldValues.hasOwnProperty('##OWNER_PW##')) {
                 ownerPW = fieldValues['##OWNER_PW##'];
@@ -148,7 +153,12 @@
 
                 formData = fdf.generator( fieldValues, tempFDF );
 
-            var args = [sourceFile, "fill_form", tempFDF, "output", destinationFile];
+            var args = [sourceFile]
+            if (inputPW) {
+                args.push("input_pw");
+                args.push(inputPW);
+            }
+            args = args.concat(["fill_form", tempFDF, "output", destinationFile]);
             if (ownerPW) {
                 args.push("owner_pw");
                 args.push(ownerPW);
