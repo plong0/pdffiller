@@ -73,11 +73,12 @@
 
             if(nameRegex !== null && (typeof nameRegex) == 'object' ) regName = nameRegex;
 
-            var args = [sourceFile, "dump_data_fields_utf8"];
+            var args = [sourceFile];
             if (inputPW) {
                 args.push("input_pw");
                 args.push(inputPW);
             }
+            args.push("dump_data_fields_utf8");
             execFile( "pdftk", args, function (error, stdout, stderr) {
                 if (error) {
                     console.log('exec error: ' + error);
