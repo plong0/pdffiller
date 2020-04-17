@@ -61,32 +61,23 @@
                 regValue = null,
                 fieldArray = [],
                 currField = {},
-                ownerPW = null,
-                userPW = null;
+                inputPW = null;
             if (source.readValuesMultiline) {
                 regValue = /FieldValue: ([\w\W\s]*?)($|---(\n|$)|Field[A-Z][\w]+:[^\n]*)/
             } else if (source.readValues) {
                 regValue = /FieldValue: ([^\n]*)/
             }
-            if (source.ownerPW) {
-                ownerPW = source.ownerPW;
-            }
-            if (source.userPW) {
-                userPW = source.userPW;
+            if (source.inputPW) {
+                inputPW = source.inputPW;
             }
 
             if(nameRegex !== null && (typeof nameRegex) == 'object' ) regName = nameRegex;
 
             var args = [sourceFile, "dump_data_fields_utf8"];
-            if (ownerPW) {
-                args.push("owner_pw");
-                args.push(ownerPW);
+            if (inputPW) {
+                args.push("input_pw");
+                args.push(inputPW);
             }
-            if (userPW) {
-                args.push("user_pw");
-                args.push(userPW);
-            }
-
             execFile( "pdftk", args, function (error, stdout, stderr) {
                 if (error) {
                     console.log('exec error: ' + error);
