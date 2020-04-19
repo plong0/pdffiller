@@ -60,16 +60,26 @@
                 regFlags = /FieldFlags: ([0-9\t .]+)/,
                 regValue = null,
                 fieldArray = [],
-                currField = {};
+                currField = {},
+                inputPW = null;
             if (source.readValuesMultiline) {
                 regValue = /FieldValue: ([\w\W\s]*?)($|---(\n|$)|Field[A-Z][\w]+:[^\n]*)/
             } else if (source.readValues) {
                 regValue = /FieldValue: ([^\n]*)/
             }
+            if (source.inputPW) {
+                inputPW = source.inputPW;
+            }
 
             if(nameRegex !== null && (typeof nameRegex) == 'object' ) regName = nameRegex;
 
-            execFile( "pdftk", [sourceFile, "dump_data_fields_utf8"], function (error, stdout, stderr) {
+            var args = [sourceFile];
+            if (inputPW) {
+                args.push("input_pw");
+                args.push(inputPW);
+            }
+            args.push("dump_data_fields_utf8");
+            execFile( "pdftk", args, function (error, stdout, stderr) {
                 if (error) {
                     console.log('exec error: ' + error);
                     return callback(error, null);
@@ -119,7 +129,21 @@
         },
 
         fillFormWithOptions: function( sourceFile, destinationFile, fieldValues, shouldFlatten, tempFDFPath, callback ) {
-
+            var inputPW = null;
+            if (fieldValues.hasOwnProperty('##INPUT_PW##')) {
+                inputPW = fieldValues['##INPUT_PW##'];
+                delete fieldValues['##INPUT_PW##'];
+            }
+            var ownerPW = null;
+            if (fieldValues.hasOwnProperty('##OWNER_PW##')) {
+                ownerPW = fieldValues['##OWNER_PW##'];
+                delete fieldValues['##OWNER_PW##'];
+            }
+            var userPW = null;
+            if (fieldValues.hasOwnProperty('##USER_PW##')) {
+                userPW = fieldValues['##USER_PW##'];
+                delete fieldValues['##USER_PW##'];
+            }
 
             //Generate the data from the field values.
             var randomSequence = Math.random().toString(36).substring(7);
@@ -129,7 +153,20 @@
 
                 formData = fdf.generator( fieldValues, tempFDF );
 
-            var args = [sourceFile, "fill_form", tempFDF, "output", destinationFile];
+            var args = [sourceFile]
+            if (inputPW) {
+                args.push("input_pw");
+                args.push(inputPW);
+            }
+            args = args.concat(["fill_form", tempFDF, "output", destinationFile]);
+            if (ownerPW) {
+                args.push("owner_pw");
+                args.push(ownerPW);
+            }
+            if (userPW) {
+                args.push("user_pw");
+                args.push(userPW);
+            }
             if (shouldFlatten) {
                 args.push("flatten");
             }
